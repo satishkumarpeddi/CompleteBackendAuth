@@ -1,6 +1,4 @@
 const express = require('express')
-const path = require('path')
-const dotenv = require('dotenv')
 const {validateSignUpMiddleware} = require('../middleware/validate')
 const {createUser} = require('../config/database')
 const auth = express.Router();
