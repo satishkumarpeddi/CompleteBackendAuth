@@ -1,8 +1,8 @@
 const express = require('express')
-const {validateSignUpMiddleware} = require('../middleware/validate')
-const {createUser} = require('../config/database')
+const bcrypt = require('bcrypt') 
+const {validateSignUpMiddleware,validateSignInMiddleware} = require('../middleware/validate')
+const {createUser,checkUserExists} = require('../config/database')
 const auth = express.Router();
-
 auth.post('/api/auth/register',validateSignUpMiddleware,async (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
@@ -13,6 +13,25 @@ auth.post('/api/auth/register',validateSignUpMiddleware,async (req,res)=>{
             msg:"User is created successfully"
        })
     }catch(err){
+        res.status(500).json({
+            msg:"Internal server failure"
+        })
+    }
+})
+
+auth.post('/api/auth/signin',validateSignInMiddleware,async (req,res)=>{
+    const username = req.body.username;
+    const password = req.body.password;
+    try{
+       if(!await checkUserExists(username,password))
+            return res.status(404).json({
+                msg:"Incorrect Username or Password"
+            })
+       res.status(201).json({
+            msg:"User is verfied successfully"
+       })
+    }catch(err){
+        console.log(err)
         res.status(500).json({
             msg:"Internal server failure"
         })
