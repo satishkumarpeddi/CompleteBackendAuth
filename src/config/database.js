@@ -40,9 +40,17 @@ const checkUser = async (username,password) => {
         return true;
 }
 
-// const getUser = async () => {
-//    const users = await Users.get
-// }
+const getAllUsers = async (currentUser) => {
+    try {
+        const users = await Users.find({
+            username:{$ne:currentUser}
+        }).select('-password');
+        return users;
+    } catch (err) {
+        throw err;
+    }
+}
+
 
 mongoose.connect(MONGODB_URL).then(()=>{
     console.log("Mongodb Connected")
@@ -50,4 +58,4 @@ mongoose.connect(MONGODB_URL).then(()=>{
     throw err;
 })
 
-module.exports = {createUser,checkUser}
+module.exports = {createUser,checkUser,getAllUsers}

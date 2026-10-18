@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken')
 const {validateSignUpMiddleware , validateSignInMiddleware,validateSessionTokenJWT} = require('../middleware/validate')
-const {createUser,checkUser} =  require('../config/database')
+const {createUser,checkUser,getAllUsers} =  require('../config/database')
 const auth = express.Router();
 
 
@@ -47,8 +47,9 @@ auth.post('/api/auth/signin',validateSignInMiddleware,async (req,res)=>{
     }
 })
 
-auth.get('/auth',validateSessionTokenJWT,(req,res)=>{
-    res.status(200).send("User found")
+auth.get('/auth',validateSessionTokenJWT,async (req,res)=>{
+    const users = await getAllUsers(req.body.username);
+    res.json(users)
 })
 
 module.exports = auth
