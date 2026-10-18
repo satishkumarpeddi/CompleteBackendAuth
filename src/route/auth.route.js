@@ -1,41 +1,47 @@
-const express = require('express')
-const bcrypt = require('bcrypt') 
-const {validateSignUpMiddleware,validateSignInMiddleware} = require('../middleware/validate')
-const {createUser,checkUserExists} = require('../config/database')
+const express = require('express');
+const {validateSignUpMiddleware , validateSignInMiddleware} = require('../middleware/validate')
+const {createUser,checkUser} =  require('../config/database')
 const auth = express.Router();
+
+
 auth.post('/api/auth/register',validateSignUpMiddleware,async (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
     const name = req.body.name;
     try{
-       await createUser(username,password,name)
-       res.status(201).json({
-            msg:"User is created successfully"
-       })
+        if(!await createUser(username,password,name))
+            return res.status(500).json({
+                msg:"User already exists in the database"
+            })
+        res.status(201).json({
+            username:username,
+            name:name
+        })
     }catch(err){
         res.status(500).json({
-            msg:"Internal server failure"
+            error:"Internal serveral failure"
         })
     }
 })
+
 
 auth.post('/api/auth/signin',validateSignInMiddleware,async (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
     try{
-       if(!await checkUserExists(username,password))
-            return res.status(404).json({
-                msg:"Incorrect Username or Password"
+        if(!await checkUser(username,password))
+            return res.status(401).json({
+                msg:"Invalid Username or Password"
             })
-       res.status(201).json({
-            msg:"User is verfied successfully"
-       })
+        res.status(201).json({
+            username:username,
+            msg:"Access Granted"
+        })
     }catch(err){
-        console.log(err)
         res.status(500).json({
-            msg:"Internal server failure"
+            error:"Internal serveral failure"
         })
     }
 })
 
-module.exports = auth;
+module.exports = auth
