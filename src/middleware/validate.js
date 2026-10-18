@@ -1,5 +1,9 @@
 const zod = require('zod');
-
+const jwt = require('jsonwebtoken')
+const path = require('path')
+require('dotenv').config({
+    path:path.resolve(__dirname,'../../.env')
+})
 const schemaSignUp = zod.object({
     username:zod.string().email(),
     password:zod.string().min(8),
@@ -61,4 +65,20 @@ const validateSignInMiddleware = (req,res,next) => {
     }
 }
 
-module.exports ={ validateSignUpMiddleware , validateSignInMiddleware}
+const validateSessionTokenJWT = (req,res,next) => {
+    const authToken = req.headers.authorization;
+    try{
+        const decode = jwt.verify(authToken,process.env.JWT_SECRET);
+        if(!decode) return res.status(401).json({
+            msg:"Unauthorized Access"
+        })
+        req.user = decode;
+        next();
+    }catch(err){
+        res.status(500).send({
+            msg:"Authorization token is required"
+        })
+    }
+}
+
+module.exports ={ validateSignUpMiddleware , validateSignInMiddleware,validateSessionTokenJWT}

@@ -1,5 +1,6 @@
 const express = require('express');
-const {validateSignUpMiddleware , validateSignInMiddleware} = require('../middleware/validate')
+const jwt = require('jsonwebtoken')
+const {validateSignUpMiddleware , validateSignInMiddleware,validateSessionTokenJWT} = require('../middleware/validate')
 const {createUser,checkUser} =  require('../config/database')
 const auth = express.Router();
 
@@ -33,8 +34,10 @@ auth.post('/api/auth/signin',validateSignInMiddleware,async (req,res)=>{
             return res.status(401).json({
                 msg:"Invalid Username or Password"
             })
+        const token = jwt.sign({username:username},process.env.JWT_SECRET)
         res.status(201).json({
             username:username,
+            token:token,
             msg:"Access Granted"
         })
     }catch(err){
@@ -42,6 +45,10 @@ auth.post('/api/auth/signin',validateSignInMiddleware,async (req,res)=>{
             error:"Internal serveral failure"
         })
     }
+})
+
+auth.get('/auth',validateSessionTokenJWT,(req,res)=>{
+    res.status(200).send("User found")
 })
 
 module.exports = auth

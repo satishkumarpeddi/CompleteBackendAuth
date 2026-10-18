@@ -40,6 +40,10 @@ const checkUser = async (username,password) => {
         return true;
 }
 
+// const getUser = async () => {
+//    const users = await Users.get
+// }
+
 mongoose.connect(MONGODB_URL).then(()=>{
     console.log("Mongodb Connected")
 }).catch((err)=>{
