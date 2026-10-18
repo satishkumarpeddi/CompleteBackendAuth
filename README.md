@@ -124,7 +124,7 @@ The following is a proposed endpoint reference. Confirm the paths against your E
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| POST | `/api/auth/signup` | Register a new user |
+| POST | `/api/auth/register` | Register a new user |
 | POST | `/api/auth/signin` | Authenticate an existing user |
 
 ### Example: User Registration
